@@ -1,0 +1,21 @@
+{
+    "name": "mauro/test",
+    "description": "pacchetto di test",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Mauro\\Test\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Mauro Casadei",
+            "email": "info@soluzionesoftware.com"
+        }
+    ],
+    "minimum-stability": "beta",
+    "require": {
+        "monolog/monolog": "^3.10",
+        "vlucas/phpdotenv": "5.3.0"
+    }
+}
