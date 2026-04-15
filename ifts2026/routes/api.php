@@ -6,9 +6,9 @@ use Illuminate\Support\Facades\Redirect;
 // use Illuminate\Support\Facades\Request as FacadeRequest;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/users', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+// Route::get('/users', function (Request $request) {
+//     return $request->user();
+// })->middleware('auth:sanctum');
 
 Route::get('/info', function () {
     return response()->json([
@@ -67,6 +67,29 @@ Route::middleware('verify.param')->prefix('admin')->group(function () {
     Route::post('/admin-users', function () {
         return response()->json([
             'message' => 'Admin Users Creazione',
+        ]);
+    });
+});
+// Rotte per autentcazione con sanctum
+Route::post('/login', function (Request $request) {
+    $validated = $request->validate([
+        'email' => 'required|email',
+        'password' => 'required|min:3',
+    ]);
+    // i parametri sono corretti, creo il token
+    if (auth()->attempt($validated)) {
+        $user = auth()->user();
+        $token = $user->createToken('auth_token')->plainTextToken;
+        return response()->json(['access_token' => $token, 'token_type' => 'Bearer']);
+    }
+    return response()->json(['message' => 'Invalid credentials'], 401);
+
+})->name('login');
+// Rotte protette da auth:sanctum
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/users', function () {
+        return response()->json([
+            'message' => 'Lista Utenti',
         ]);
     });
 });
