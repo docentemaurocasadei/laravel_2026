@@ -5,7 +5,7 @@ use Illuminate\Http\Request;
 // use Illuminate\Support\Facades\Request as FacadeRequest;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
+Route::get('/users', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
@@ -15,7 +15,7 @@ Route::get('/info', function () {
     ]);
 });
 
-Route::get('/product', function (Request $request) {
+Route::get('/products', function (Request $request) {
     Log::debug('metodo:'.$request->method());
     // Log::debug(request()->getMethod());
     // Log::debug(FacadeRequest::method());
@@ -23,23 +23,23 @@ Route::get('/product', function (Request $request) {
         'message' => 'Lista Prodotti',
     ]);
 });
-Route::post('/product', function () {
+Route::post('/products', function () {
     return response()->json([
         'message' => 'Creazione Prodotto',
     ]);
 });
-Route::put('/product/{id}', function ($id) {
+Route::put('/products/{id}', function ($id) {
     return response()->json([
         'message' => "Aggiornamento Prodotto con ID: $id",
     ]);
 });
-Route::delete('/product/{id}', function ($id) {
+Route::delete('/products/{id}', function ($id) {
     return response()->json([
         'message' => "Eliminazione Prodotto con ID: $id",
     ]);
 });
 //creare la rotta per lo show del prodotto con id dinamico
-Route::get('/product/{id}', function ($id) {
+Route::get('/products/{id}', function ($id) {
     return response()->json([
         'message' => "Dettagli Prodotto con ID: $id",
     ]);

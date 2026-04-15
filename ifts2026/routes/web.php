@@ -25,3 +25,6 @@ Route::get('/ifts2026', function () {
 Route::get('/info', function () {
     return response()->view('info');
 });
+Route::get('/pippo', function () {
+    return Redirect::to('/api/product');
+});
