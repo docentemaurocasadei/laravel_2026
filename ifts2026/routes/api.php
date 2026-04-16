@@ -90,6 +90,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/users', function () {
         return response()->json([
             'message' => 'Lista Utenti',
+            'user' => auth()->user(),
         ]);
     });
 });
