@@ -94,3 +94,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         ]);
     });
 });
+//non protette da auth:sanctum
+// Route::get('/mio', [App\Http\Controllers\MioController::class, 'index']);
+// Route::post('/mio', [App\Http\Controllers\MioController::class, 'store']);
+// Route::resource('courses', App\Http\Controllers\CourseController::class);//->only(['index', 'store', 'show', 'update', 'destroy']);
+
+Route::apiResource('courses', App\Http\Controllers\CourseController::class);
+Route::apiResource('categories', App\Http\Controllers\CategoryController::class);
+Route::apiResource('tools', App\Http\Controllers\ToolController::class);
