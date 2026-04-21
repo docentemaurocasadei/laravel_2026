@@ -101,4 +101,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 Route::apiResource('courses', App\Http\Controllers\CourseController::class);
 Route::apiResource('categories', App\Http\Controllers\CategoryController::class);
+Route::get('/tools/count', [App\Http\Controllers\ToolController::class, 'count'])->name('tools.count');
 Route::apiResource('tools', App\Http\Controllers\ToolController::class);
+#creare una rotta per ritornare il numero dei tools presenti nel database
+#creare una rotta + inserire un metodo count() nel controller
+#all'interno del metodo count() eseguire un aquery per contare i tools

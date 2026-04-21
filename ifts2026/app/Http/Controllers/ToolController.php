@@ -74,4 +74,9 @@ class ToolController extends Controller
             return response()->json(['message' => 'Tool not found'], 404);
         }   
     }
+    public function count()
+    {
+        $count = DB::table('tools')->count();
+        return response()->json(['count' => $count]);
+    }
 }
