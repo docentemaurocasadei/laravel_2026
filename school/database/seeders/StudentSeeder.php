@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class StudentSeeder extends Seeder
 {
@@ -51,7 +52,7 @@ class StudentSeeder extends Seeder
         ];
 
         foreach ($students as $student) {
-            \App\Models\Student::create($student);
+            DB::table('students')->insert($student);
         }
 
     }
