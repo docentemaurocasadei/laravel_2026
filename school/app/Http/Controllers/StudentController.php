@@ -11,6 +11,33 @@ class StudentController extends Controller
     // {
     //     $this->middleware('auth:sanctum')->except(['index', 'show']);
     // }
+    public function search(Request $request)
+    {
+        $validatedData = $request->validate([
+            'name' => 'nullable|string|max:20',
+            'surname' => 'nullable|string|max:20',
+        ]);    
+        if (empty($validatedData['name']) && empty($validatedData['surname'])) {
+            return response()->json(['message' => 'At least one search parameter is required'], 400);
+        }
+        switch (true) {
+            case empty($validatedData['name']) && !empty($validatedData['surname']):
+                $students = Student::where('surname', 'like', "%{$validatedData['surname']}%")
+                    ->get();
+                break;
+            case !empty($validatedData['name']) && empty($validatedData['surname']):
+                $students = Student::where('name', 'like', "%{$validatedData['name']}%")
+                    ->get();
+                break;
+            case !empty($validatedData['name']) && !empty($validatedData['surname']):
+                $students = Student::where('name', 'like', "%{$validatedData['name']}%")
+                    ->where('surname', 'like', "%{$validatedData['surname']}%")
+                    ->get();
+                break;
+        }
+        
+        return response()->json($students);
+    }
     /**
      * Display a listing of the resource.
      */
@@ -33,11 +60,23 @@ class StudentController extends Controller
             'mobile' => 'nullable|string|max:20',
             'email' => 'nullable|string|max:150',
             'birth_date' => 'nullable|date',
+            'fiscal_code' => 'nullable|string|max:16',
+            'civil_status' => 'nullable|string|max:20'
         ]);
 
         //$result = DB::table('students')->insert($validatedData);
         //$student = DB::table('students')->where('id', DB::getPdo()->lastInsertId())->firstOrFail();   
-        $student = Student::create($validatedData);
+        $student = Student::create([
+            'name' => $validatedData['name'],
+            'surname' => $validatedData['surname'],
+            'mobile' => $validatedData['mobile'] ?? null,
+            'email' => $validatedData['email'] ?? null,
+            'birth_date' => $validatedData['birth_date'] ?? null,
+        ]);
+        $student->profile()->create([
+            'fiscal_code' => $validatedData['fiscal_code'] ?? null,
+            'civil_status' => $validatedData['civil_status'] ?? null,
+        ]);
         return response()->json($student, 201);
     }
 
@@ -47,7 +86,12 @@ class StudentController extends Controller
     public function show(string $id)
     {
         //$student = DB::table('students')->where('id', $id)->firstOrFail();
-        $student = Student::findOrFail($id);
+        // $student = DB::table('students')->leftJoin('votes', 'students.id', '=', 'votes.student_id')
+        //     ->select('students.*, votes.*')
+        //     ->where('students.id', $id)
+        //     ->firstOrFail();
+
+        $student = Student::with(['profile', 'votes'])->findOrFail($id);
         return response()->json($student);
     }
 

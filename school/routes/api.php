@@ -9,11 +9,18 @@ Route::get('/user', function (Request $request) {
 
 //User::create(['email' => 'admin@example.com', 'name'=> 'admin', 'password' => Hash::make('password123')]);  
 
+Route::post('/students/search', [\App\Http\Controllers\StudentController::class, 'search'])->name('students.search');
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/courses/{course}/students', [\App\Http\Controllers\CourseController::class, 'addStudents'])->name('courses.enroll');
+    Route::delete('/courses/{course}/students/{student}', [\App\Http\Controllers\CourseController::class, 'removeStudent'])->name('courses.removeStudent');
     Route::apiResource('students', \App\Http\Controllers\StudentController::class)
+    ->only(['store', 'update', 'destroy']);
+    Route::apiResource('courses', \App\Http\Controllers\CourseController::class)
     ->only(['store', 'update', 'destroy']);
 });
 Route::apiResource('students', \App\Http\Controllers\StudentController::class)
+->only(['index', 'show']);
+Route::apiResource('courses', \App\Http\Controllers\CourseController::class)
 ->only(['index', 'show']);
 
 Route::post('/login', function (Request $request) {
