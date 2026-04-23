@@ -1,0 +1,49 @@
+Esercizio Laravel API REST – Gestione Studenti e Corsi
+
+Realizzare un progetto Laravel con API REST per la gestione di studenti e corsi, utilizzando Eloquent ORM, migrazioni, relazioni tra modelli e autenticazione API con Laravel Sanctum. L’obiettivo è costruire un piccolo backend scolastico in cui sia possibile consultare e amministrare studenti, corsi, profili personali degli studenti e voti, distinguendo correttamente tra rotte pubbliche e rotte protette.
+
+Il database deve essere composto dalle seguenti tabelle.
+
+La tabella students rappresenta l’anagrafica principale degli studenti e contiene i campi: id, name di tipo stringa con lunghezza massima 20 caratteri, surname di tipo stringa con lunghezza massima 20 caratteri, mobile di tipo stringa con lunghezza massima 20 caratteri e nullable, email di tipo stringa con lunghezza massima 150 caratteri e nullable, birth_date di tipo date e nullable, softDeletes, created_at e updated_at.
+
+La tabella courses rappresenta i corsi disponibili e contiene i campi: id, name di tipo stringa con lunghezza massima 50 caratteri, duration di tipo intero, created_at e updated_at.
+
+La tabella student_profiles contiene i dati aggiuntivi dello studente ed è collegata alla tabella students con una relazione uno a uno. I campi sono: id, fiscal_code di tipo stringa con lunghezza massima 16 caratteri e nullable, civil_status di tipo stringa con lunghezza massima 20 caratteri e nullable, student_id come chiave esterna verso students con cancellazione a cascata, created_at e updated_at.
+
+La tabella votes contiene i voti associati agli studenti ed è collegata alla tabella students con una relazione uno a molti. I campi sono: id, value di tipo decimal(5,2), student_id come chiave esterna verso students con cancellazione a cascata, created_at e updated_at.
+
+La tabella course_student è la tabella pivot che serve a gestire la relazione molti a molti tra students e courses. I campi sono: id, course_id come chiave esterna verso courses con cancellazione a cascata, student_id come chiave esterna verso students con cancellazione a cascata, created_at e updated_at.
+
+Dal punto di vista delle relazioni Eloquent, il model Student deve avere una relazione belongsToMany con Course per rappresentare il fatto che uno studente può essere iscritto a più corsi, una relazione hasOne con StudentProfile per il profilo personale e una relazione hasMany con Vote per i voti. Il model Course deve avere una relazione belongsToMany con Student, perché ogni corso può avere più studenti iscritti. Il model StudentProfile deve avere una relazione belongsTo verso Student. Il model Vote deve avere una relazione belongsTo verso Student.
+
+È importante evidenziare con precisione la relazione molti a molti tra studenti e corsi. Ogni studente può frequentare più corsi e ogni corso può contenere più studenti. Questa relazione non viene gestita con una semplice chiave esterna, ma tramite la tabella pivot course_student. In pratica, ogni riga della tabella course_student collega uno studente a un corso. Questo significa che uno stesso student_id può comparire più volte associato a course_id diversi, e uno stesso course_id può comparire più volte associato a student_id diversi.
+
+L’applicazione deve utilizzare Laravel Sanctum per proteggere parte delle API. Deve essere presente un endpoint di login raggiungibile tramite POST /api/login. L’utente iniziale può essere creato con email e password definite dal docente o dall’esercizio. Dopo un login corretto, il sistema deve restituire un token Bearer da utilizzare nelle richieste alle rotte protette tramite header Authorization.
+
+Le rotte pubbliche, quindi accessibili senza autenticazione, sono quelle di consultazione. Deve essere possibile ottenere l’elenco degli studenti tramite GET /api/students, il dettaglio di uno studente tramite GET /api/students/{id}, l’elenco dei corsi tramite GET /api/courses, il dettaglio di un corso tramite GET /api/courses/{id}, e la ricerca degli studenti tramite POST /api/students/search.
+
+Le rotte protette dal middleware auth:sanctum sono invece quelle che modificano i dati. Per gli studenti devono essere implementati POST /api/students per creare un nuovo studente, PUT oppure PATCH /api/students/{id} per modificare uno studente esistente e DELETE /api/students/{id} per eliminarlo. Per i corsi devono essere implementati POST /api/courses per creare un corso, PUT oppure PATCH /api/courses/{id} per aggiornarlo e DELETE /api/courses/{id} per eliminarlo.
+
+Deve essere implementata anche la gestione delle iscrizioni degli studenti ai corsi, che rappresenta operativamente la relazione molti a molti. Tramite POST /api/courses/{course}/students deve essere possibile associare uno o più studenti a un corso inviando un array chiamato student_ids. Tramite DELETE /api/courses/{course}/students/{student} deve essere possibile rimuovere uno studente da quel corso. In altre parole, questi endpoint servono a inserire o rimuovere record nella tabella pivot course_student.
+
+Per quanto riguarda il comportamento richiesto dei controller, l’endpoint show del CourseController deve restituire il corso insieme agli studenti iscritti, quindi il dettaglio di un corso deve includere anche la relazione students. Questo serve a verificare che la relazione molti a molti sia stata configurata correttamente e caricata in lettura.
+
+Per quanto riguarda lo StudentController, l’endpoint show deve restituire il dettaglio dello studente con il profilo personale e i voti associati. Poiché nel dominio del problema esiste anche la relazione molti a molti con i corsi, il comportamento atteso dell’esercizio dovrebbe prevedere che nel dettaglio dello studente vengano restituiti anche i corsi frequentati, così da mostrare in modo completo tutte le relazioni principali dello studente: profilo, voti e corsi.
+
+La creazione di uno studente deve permettere di salvare sia i dati anagrafici sia i dati del profilo. In particolare, nella richiesta di creazione devono poter essere inviati i campi name, surname, mobile, email, birth_date, fiscal_code e civil_status. I primi cinque appartengono alla tabella students, mentre fiscal_code e civil_status appartengono alla tabella student_profiles. Dopo il salvataggio dello studente, deve essere creato anche il record del profilo collegato.
+
+La ricerca studenti tramite POST /api/students/search deve permettere di cercare almeno per name e surname, usando ricerche parziali con like. Se entrambi i campi risultano vuoti, l’endpoint deve restituire un messaggio di errore che segnali che almeno un parametro di ricerca è obbligatorio.
+
+Per i corsi, la creazione e modifica devono utilizzare i campi name e duration. Il campo name è obbligatorio, stringa, massimo 50 caratteri. Il campo duration è intero e può essere valorizzato secondo la logica definita nel controller.
+
+Per gli studenti, la validazione deve controllare che name sia obbligatorio, stringa e massimo 20 caratteri, surname sia obbligatorio, stringa e massimo 20 caratteri, mobile sia opzionale, stringa e massimo 20 caratteri, email sia opzionale, stringa e massimo 150 caratteri, birth_date sia opzionale ma valida come data, fiscal_code sia opzionale, stringa e massimo 16 caratteri, e civil_status sia opzionale, stringa e massimo 20 caratteri.
+
+Per i voti, anche se il controller risulta ancora da completare, il modello dati prevede che ogni voto appartenga a uno studente e contenga almeno il valore numerico value e il riferimento student_id. Di conseguenza, un eventuale completamento dell’esercizio può includere anche CRUD o endpoint dedicati ai voti, mantenendo la relazione uno a molti tra students e votes.
+
+Le risposte JSON devono essere chiare e coerenti. Gli endpoint index devono restituire collezioni di record, gli endpoint show devono restituire il singolo record con le relazioni richieste, gli endpoint store devono restituire il record creato con status 201, gli endpoint update devono restituire il record aggiornato e gli endpoint destroy possono restituire il record eliminato oppure una risposta vuota con codice appropriato, in base alla scelta implementativa.
+
+Un aspetto importante dell’esercizio è distinguere bene le tre tipologie di relazione presenti. La relazione uno a uno è tra students e student_profiles: ogni studente ha un solo profilo e ogni profilo appartiene a un solo studente. La relazione uno a molti è tra students e votes: uno studente può avere molti voti, ma ogni voto appartiene a un solo studente. La relazione molti a molti è tra students e courses: uno studente può essere iscritto a molti corsi e ogni corso può avere molti studenti; questa relazione è gestita tramite la tabella pivot course_student e tramite i metodi belongsToMany nei due model.
+
+Il progetto finale dovrà quindi consentire il login con Sanctum, la lettura pubblica di studenti e corsi, la gestione protetta di creazione, modifica ed eliminazione di studenti e corsi, la ricerca studenti, la gestione delle iscrizioni ai corsi e la restituzione delle relazioni corrette nei metodi di dettaglio.
+
+La consegna deve comprendere il progetto Laravel funzionante, le migrazioni corrette, i model con le relazioni configurate, i controller API, il file routes/api.php con la suddivisione tra rotte pubbliche e protette e, facoltativamente, una collection Postman per il test degli endpoint.
