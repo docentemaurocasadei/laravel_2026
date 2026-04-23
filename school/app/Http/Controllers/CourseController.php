@@ -74,7 +74,6 @@ class CourseController extends Controller
         ]);
 
         $course->students()->syncWithoutDetaching($validatedData['student_ids']);
-        $course->students()->syncWithoutDetaching([3,4,5]);
 
         return response()->json(
             [
